@@ -87,8 +87,16 @@ export async function startResearch(topic: string, options?: {
 
 // Get project by ID
 export async function getProject(id: string): Promise<ProjectResponse> {
-  const response = await fetch(`${API_URL}/v1/project/${id}`);
-  return response.json();
+  try {
+    const response = await fetch(`${API_URL}/v1/project/${id}`);
+    if (!response.ok) {
+      return { success: false, project: null as unknown as Project, results: { images: [], videos: [], news: [] } };
+    }
+    return response.json();
+  } catch (error) {
+    console.error('API error:', error);
+    return { success: false, project: null as unknown as Project, results: { images: [], videos: [], news: [] } };
+  }
 }
 
 // Test search (no DB save)

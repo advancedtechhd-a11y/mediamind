@@ -33,14 +33,21 @@ export default function Dashboard() {
           },
         }
       );
+      if (!response.ok) {
+        console.error('Failed to fetch projects:', response.status);
+        setProjects([]);
+        return;
+      }
       const data = await response.json();
-      setProjects(data || []);
+      // Ensure data is an array
+      const projectsArray = Array.isArray(data) ? data : [];
+      setProjects(projectsArray);
 
       // Calculate stats
-      const totalResearches = data?.length || 0;
+      const totalResearches = projectsArray.length;
       let totalImages = 0;
       let totalClips = 0;
-      data?.forEach((p: Project) => {
+      projectsArray.forEach((p: Project) => {
         totalImages += p.image_count || 0;
         totalClips += p.clip_count || 0;
       });

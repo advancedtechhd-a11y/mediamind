@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, Suspense } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft, Image as ImageIcon, Video, FileText, Scissors,
@@ -9,12 +9,12 @@ import {
 } from 'lucide-react';
 import { getProject, type ProjectResponse, type MediaItem, type VideoWithClips, type Clip } from '@/lib/api';
 
-export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+function ProjectContent({ id }: { id: string }) {
   const [data, setData] = useState<ProjectResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'images' | 'videos' | 'clips' | 'news'>('images');
   const [polling, setPolling] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProject();
@@ -34,9 +34,15 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
   async function fetchProject() {
     try {
       const result = await getProject(id);
-      setData(result);
-    } catch (error) {
-      console.error('Failed to fetch project:', error);
+      if (result && result.project) {
+        setData(result);
+        setError(null);
+      } else {
+        setError('Project not found');
+      }
+    } catch (err) {
+      console.error('Failed to fetch project:', err);
+      setError('Failed to load project');
     } finally {
       setLoading(false);
     }
@@ -57,11 +63,11 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  if (!data?.project) {
+  if (error || !data?.project) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
         <XCircle className="w-16 h-16 text-red-500 mb-4" />
-        <h1 className="text-2xl font-bold mb-2">Project Not Found</h1>
+        <h1 className="text-2xl font-bold mb-2">{error || 'Project Not Found'}</h1>
         <Link href="/" className="text-blue-500 hover:underline">Go back home</Link>
       </div>
     );
@@ -220,6 +226,21 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         )}
       </main>
     </div>
+  );
+}
+
+// Main page component that handles params
+export default function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      </div>
+    }>
+      <ProjectContent id={id} />
+    </Suspense>
   );
 }
 
