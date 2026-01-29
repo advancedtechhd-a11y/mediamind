@@ -7,7 +7,7 @@ import {
   Download, Share2, Copy, Loader2, ExternalLink, Play,
   Newspaper, Clock, CheckCircle2, XCircle
 } from 'lucide-react';
-import { getProject, type ProjectResponse, type MediaItem, type VideoWithClips, type Clip } from '@/lib/api';
+import { getProject, cancelResearch, type ProjectResponse, type MediaItem, type VideoWithClips, type Clip } from '@/lib/api';
 
 function ProjectContent({ id }: { id: string }) {
   const [data, setData] = useState<ProjectResponse | null>(null);
@@ -52,6 +52,16 @@ function ProjectContent({ id }: { id: string }) {
     if (data) {
       navigator.clipboard.writeText(JSON.stringify(data, null, 2));
       alert('API response copied to clipboard!');
+    }
+  }
+
+  async function handleCancel() {
+    if (!confirm('Stop this research?')) return;
+    try {
+      await cancelResearch(id);
+      fetchProject(); // Refresh to show cancelled status
+    } catch (err) {
+      console.error('Failed to cancel:', err);
     }
   }
 
@@ -125,17 +135,28 @@ function ProjectContent({ id }: { id: string }) {
                 <span className={`flex items-center gap-1 ${
                   project.status === 'completed' ? 'text-green-400' :
                   project.status === 'processing' ? 'text-blue-400' :
-                  project.status === 'failed' ? 'text-red-400' : 'text-gray-400'
+                  project.status === 'failed' ? 'text-red-400' :
+                  project.status === 'cancelled' ? 'text-orange-400' : 'text-gray-400'
                 }`}>
                   {project.status === 'completed' && <CheckCircle2 className="w-4 h-4" />}
                   {project.status === 'processing' && <Loader2 className="w-4 h-4 animate-spin" />}
                   {project.status === 'failed' && <XCircle className="w-4 h-4" />}
+                  {project.status === 'cancelled' && <XCircle className="w-4 h-4" />}
                   {project.status}
                   {polling && ' (updating...)'}
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {project.status === 'processing' && (
+                <button
+                  onClick={handleCancel}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm transition-colors"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Stop Research
+                </button>
+              )}
               <button
                 onClick={copyApiResponse}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm transition-colors"

@@ -6,7 +6,7 @@ export interface Project {
   id: string;
   topic: string;
   slug: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
   image_count?: number;
   video_count?: number;
   clip_count?: number;
@@ -128,4 +128,12 @@ export async function getProjects(): Promise<Project[]> {
   if (!response.ok) return [];
   const data = await response.json();
   return data.projects || [];
+}
+
+// Cancel/Stop a research
+export async function cancelResearch(id: string): Promise<{ success: boolean }> {
+  const response = await fetch(`${API_URL}/v1/project/${id}`, {
+    method: 'DELETE',
+  });
+  return response.json();
 }
