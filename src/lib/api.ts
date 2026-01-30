@@ -1,6 +1,6 @@
 // MediaMind API Client
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://worker-production-5f19.up.railway.app';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://ik4g0gsg8ko8wcko8s840k4c.46.224.208.101.sslip.io';
 
 export interface Project {
   id: string;

@@ -253,7 +253,7 @@ export default function Dashboard() {
       <footer className="border-t border-gray-800 mt-16 py-8 text-center text-gray-500 text-sm">
         <p>MediaMind - AI-powered media research</p>
         <p className="mt-1">
-          API: <code className="bg-gray-800 px-2 py-1 rounded text-xs">https://worker-production-5f19.up.railway.app</code>
+          API: <code className="bg-gray-800 px-2 py-1 rounded text-xs">http://ik4g0gsg8ko8wcko8s840k4c.46.224.208.101.sslip.io</code>
         </p>
       </footer>
     </div>
