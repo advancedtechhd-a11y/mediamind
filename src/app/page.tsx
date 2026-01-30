@@ -7,7 +7,7 @@ import { startResearch, type Project } from '@/lib/api';
 import { formatDistanceToNow } from 'date-fns';
 
 const SUPABASE_URL = 'https://wwgwvfhujfbtlotndqzt.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Z3d2Zmh1amZidGxvdG5kcXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTUxOTAsImV4cCI6MjA4NTI3MTE5MH0.VTavPv9ZQEM4UQCR_dyB0HDpjGRfLzk5LQPXD7cz2CQ';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Z3d2Zmh1amZidGxvdG5kcXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTUxOTAsImV4cCI6MjA4NTI3MTE5MH0.zO3XyyooQ8ZTEHb_Tx643U4cV1WSWXl1WyqyvvjiV3M';
 
 export default function Dashboard() {
   const router = useRouter();
