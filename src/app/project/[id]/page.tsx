@@ -7,7 +7,10 @@ import {
   Download, Share2, Copy, Loader2, ExternalLink, Play,
   Newspaper, Clock, CheckCircle2, XCircle
 } from 'lucide-react';
-import { getProject, cancelResearch, type ProjectResponse, type MediaItem, type VideoWithClips, type Clip } from '@/lib/api';
+import { type ProjectResponse, type MediaItem, type VideoWithClips, type Clip, type Project } from '@/lib/api';
+
+const SUPABASE_URL = 'https://wwgwvfhujfbtlotndqzt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Z3d2Zmh1amZidGxvdG5kcXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTUxOTAsImV4cCI6MjA4NTI3MTE5MH0.zO3XyyooQ8ZTEHb_Tx643U4cV1WSWXl1WyqyvvjiV3M';
 
 function ProjectContent({ id }: { id: string }) {
   const [data, setData] = useState<ProjectResponse | null>(null);
@@ -33,13 +36,64 @@ function ProjectContent({ id }: { id: string }) {
 
   async function fetchProject() {
     try {
-      const result = await getProject(id);
-      if (result && result.project) {
-        setData(result);
-        setError(null);
-      } else {
+      // Fetch project directly from Supabase
+      const projectRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/projects?id=eq.${id}&select=*`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+          },
+        }
+      );
+      const projects = await projectRes.json();
+
+      if (!projects || projects.length === 0) {
         setError('Project not found');
+        setLoading(false);
+        return;
       }
+
+      const project = projects[0] as Project;
+
+      // Fetch media for this project
+      const mediaRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/media?project_id=eq.${id}&select=*`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+          },
+        }
+      );
+      const media = await mediaRes.json() as MediaItem[];
+
+      // Fetch clips for this project
+      const clipsRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/clips?project_id=eq.${id}&select=*`,
+        {
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+          },
+        }
+      );
+      const clips = await clipsRes.json() as Clip[];
+
+      // Organize results
+      const images = media.filter(m => m.type === 'image') || [];
+      const videos = (media.filter(m => m.type === 'video') || []).map(v => ({
+        ...v,
+        clips: clips.filter(c => c.media_id === v.id) || [],
+      })) as VideoWithClips[];
+      const news = media.filter(m => ['newspaper_scan', 'article_screenshot'].includes(m.type)) || [];
+
+      setData({
+        success: true,
+        project,
+        results: { images, videos, news },
+      });
+      setError(null);
     } catch (err) {
       console.error('Failed to fetch project:', err);
       setError('Failed to load project');
@@ -58,7 +112,19 @@ function ProjectContent({ id }: { id: string }) {
   async function handleCancel() {
     if (!confirm('Stop this research?')) return;
     try {
-      await cancelResearch(id);
+      // Update status directly in Supabase
+      await fetch(
+        `${SUPABASE_URL}/rest/v1/projects?id=eq.${id}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ status: 'cancelled' }),
+        }
+      );
       fetchProject(); // Refresh to show cancelled status
     } catch (err) {
       console.error('Failed to cancel:', err);
