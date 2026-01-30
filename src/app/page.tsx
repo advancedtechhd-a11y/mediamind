@@ -6,8 +6,8 @@ import { Search, Image, Video, FileText, Scissors, Key, BarChart3, Loader2, Exte
 import { startResearch, type Project } from '@/lib/api';
 import { formatDistanceToNow } from 'date-fns';
 
-const SUPABASE_URL = 'https://cvrljraleemzdsbgxkek.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN2cmxqcmFsZWVtemRzYmd4a2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwNjM1MTcsImV4cCI6MjA4MzYzOTUxN30.bEvLbflUNgEa3lOLHdpSFMN5FfvwQN-8V6stDpKCsGg';
+const SUPABASE_URL = 'https://wwgwvfhujfbtlotndqzt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind3Z3d2Zmh1amZidGxvdG5kcXp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk2OTUxOTAsImV4cCI6MjA4NTI3MTE5MH0.VTavPv9ZQEM4UQCR_dyB0HDpjGRfLzk5LQPXD7cz2CQ';
 
 export default function Dashboard() {
   const router = useRouter();
