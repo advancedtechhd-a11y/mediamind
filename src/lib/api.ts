@@ -71,13 +71,13 @@ export interface ProjectResponse {
   results: ProjectResults;
 }
 
-// Start a new research
+// Start a new research (uses proxy to avoid mixed content)
 export async function startResearch(topic: string, options?: {
   max_images?: number;
   max_videos?: number;
   max_news?: number;
 }): Promise<ResearchResponse> {
-  const response = await fetch(`${API_URL}/v1/research`, {
+  const response = await fetch('/api/research', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ topic, options }),
